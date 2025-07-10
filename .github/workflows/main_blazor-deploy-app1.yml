@@ -39,13 +39,23 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     
-    
+    permissions:
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
       
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_BE2A4F8D9BB54F9B9146A72F72FCED71 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_705C6B750C29476EB46D3565F84B4A43 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4BDFADCF419D4721BCC2BCE16B1F7BB7 }}
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
@@ -53,4 +63,4 @@ jobs:
           app-name: 'blazor-deploy-app1'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_36CECD6C958143618ADB4A0C93982BF7 }}
+          
